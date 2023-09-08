@@ -413,7 +413,7 @@
                 "type": "uint256"
             }
         ],
-        "name": "packType",
+        "name": "passType",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -428,11 +428,11 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "packType_",
+                "name": "passType_",
                 "type": "uint256"
             }
         ],
-        "name": "packURI",
+        "name": "passURI",
         "outputs": [
             {
                 "internalType": "string",
@@ -542,7 +542,7 @@
             },
             {
                 "internalType": "uint256",
-                "name": "packType_",
+                "name": "passType_",
                 "type": "uint256"
             }
         ],
@@ -705,16 +705,16 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "packType_",
+                "name": "passType_",
                 "type": "uint256"
             },
             {
                 "internalType": "string",
-                "name": "packURI_",
+                "name": "passURI_",
                 "type": "string"
             }
         ],
-        "name": "updatePackURI",
+        "name": "updatePassURI",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

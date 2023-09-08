@@ -1,0 +1,11 @@
+{
+    "name": "Dogegoal Early Starter Pass",
+    "description": "Dogegoal Early Starter Pass",
+    "image": "https://dogegoal.ai/assets/early_starter_pass.png",
+    "attributes": [
+      {
+        "trait_type": "Type",
+        "value": "Starter"
+      }
+    ]
+  }

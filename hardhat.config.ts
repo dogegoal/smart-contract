@@ -20,8 +20,6 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
-const {} = process.env;
-
 const {
   BSC_TESTNET_PRIVATE_KEY: bscTestnetPrivateKey,
   BSC_MAINNET_PRIVATE_KEY: bscMainnetPrivateKey,

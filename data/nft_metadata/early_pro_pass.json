@@ -1,0 +1,11 @@
+{
+    "name": "Dogegoal Early Pro Pass",
+    "description": "Dogegoal Early Pro Pass",
+    "image": "https://dogegoal.ai/assets/early_pro_pass.png",
+    "attributes": [
+      {
+        "trait_type": "Type",
+        "value": "Pro"
+      }
+    ]
+  }

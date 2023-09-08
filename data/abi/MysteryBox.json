@@ -29,6 +29,44 @@
         "anonymous": false,
         "inputs": [
             {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "reqId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "n",
+                "type": "uint256"
+            }
+        ],
+        "name": "ReceivedRandomness",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "reqId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "invoker",
+                "type": "address"
+            }
+        ],
+        "name": "RequestedRandomness",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
                 "indexed": true,
                 "internalType": "bytes32",
                 "name": "role",
@@ -114,25 +152,6 @@
         "type": "event"
     },
     {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "invitee",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "referrer",
-                "type": "address"
-            }
-        ],
-        "name": "Whitelisted",
-        "type": "event"
-    },
-    {
         "inputs": [],
         "name": "DEFAULT_ADMIN_ROLE",
         "outputs": [
@@ -146,42 +165,21 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "WITHDRAWER_ROLE",
-        "outputs": [
-            {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "referrer_",
-                "type": "address"
-            }
-        ],
-        "name": "finishWhitelist",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getBalance",
-        "outputs": [
+                "internalType": "uint256",
+                "name": "requestId",
+                "type": "uint256"
+            },
             {
                 "internalType": "uint256",
-                "name": "",
+                "name": "randomness",
                 "type": "uint256"
             }
         ],
-        "stateMutability": "view",
+        "name": "fulfillRandomness",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -249,12 +247,7 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "earlyPass_",
-                "type": "address"
-            },
-            {
-                "internalType": "address payable",
-                "name": "beneficary_",
+                "name": "footieSuperstar_",
                 "type": "address"
             }
         ],
@@ -264,14 +257,8 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "passType_",
-                "type": "uint256"
-            }
-        ],
-        "name": "passPrice",
+        "inputs": [],
+        "name": "mintFee",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -280,6 +267,19 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "openBox",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "payable",
         "type": "function"
     },
     {
@@ -300,19 +300,6 @@
             }
         ],
         "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "passType_",
-                "type": "uint256"
-            }
-        ],
-        "name": "purchasePass",
-        "outputs": [],
-        "stateMutability": "payable",
         "type": "function"
     },
     {
@@ -354,12 +341,12 @@
     {
         "inputs": [
             {
-                "internalType": "address payable",
-                "name": "beneficary_",
+                "internalType": "address",
+                "name": "footieSuperstar_",
                 "type": "address"
             }
         ],
-        "name": "setBeneficary",
+        "name": "setFootieSuperstar",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -368,16 +355,11 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "passType_",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "price_",
+                "name": "fee",
                 "type": "uint256"
             }
         ],
-        "name": "setPassPrice",
+        "name": "setMintFee",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -409,14 +391,34 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "withdrawAll",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "addr",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "withdraw",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "stateMutability": "payable",
-        "type": "receive"
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "addr",
+                "type": "address"
+            }
+        ],
+        "name": "withdrawAll",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     }
 ]

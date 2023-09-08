@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721PausableUpgradeable.sol";
-import "./IEarlyPack.sol";
+import "./IEarlyPass.sol";
 
 contract EarlyAccess is AccessControlUpgradeable, PausableUpgradeable {
     // Consts
@@ -12,42 +12,53 @@ contract EarlyAccess is AccessControlUpgradeable, PausableUpgradeable {
     bytes32 public constant WITHDRAWER_ROLE = keccak256("WITHDRAWER_ROLE");
 
     // Storage
-    IEarlyPack private _earlyPack;
+    IEarlyPass private _earlyPass;
     address payable private _beneficary;
     uint256 private _totalSupply;
-    // @dev PackType => PackPrice
-    mapping(uint256 => uint256) private _packPrices;
+    // @dev PassType => PassPrice
+    mapping(uint256 => uint256) private _passPrices;
+    mapping(address => address) private _whitelists;
 
-    function initialize(address earlyPack_, address payable beneficary_) public initializer {
+    // Event
+    event Whitelisted(address indexed invitee, address indexed referrer);
+
+    function initialize(address earlyPass_, address payable beneficary_) public initializer {
         __AccessControl_init_unchained();
 
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _setupRole(ADMIN_ROLE, _msgSender());
         _setupRole(WITHDRAWER_ROLE, _msgSender());
 
-        _earlyPack = IEarlyPack(earlyPack_);
+        _earlyPass = IEarlyPass(earlyPass_);
         _beneficary = beneficary_;
     }
 
-    function setPackPrice(uint256 packType_, uint256 price_) public onlyRole(ADMIN_ROLE) whenNotPaused {
-        _packPrices[packType_] = price_;
+    function setPassPrice(uint256 passType_, uint256 price_) public onlyRole(ADMIN_ROLE) whenNotPaused {
+        _passPrices[passType_] = price_;
     }
 
     function setBeneficary(address payable beneficary_) public onlyRole(ADMIN_ROLE) whenNotPaused {
         _beneficary = beneficary_;
     }
 
-    function purchasePack(uint256 packType_) public payable whenNotPaused {
-        uint256 price = packPrice(packType_);
-        require(price > 0, "Invalid pack");
+    function purchasePass(uint256 passType_) public payable whenNotPaused {
+        uint256 price = passPrice(passType_);
+        require(price > 0, "Invalid pass");
         require(msg.value >= price, "Invalid Amount");
 
         (bool isSuccess, ) = _beneficary.call{value: msg.value}("");
         require(isSuccess, "Transfer failed");
 
-        _earlyPack.safeMint(_msgSender(), _totalSupply, packType_);
+        _earlyPass.safeMint(_msgSender(), _totalSupply, passType_);
 
         _totalSupply = _totalSupply + 1;
+    }
+
+    function finishWhitelist(address referrer_) external whenNotPaused {
+        require(_whitelists[_msgSender()] == address(0), "Already whitelisted");
+        address sender = _msgSender();
+        _whitelists[sender] = referrer_;
+        emit Whitelisted(sender, referrer_);
     }
 
     /**
@@ -75,7 +86,7 @@ contract EarlyAccess is AccessControlUpgradeable, PausableUpgradeable {
 
     receive() external payable {}
 
-    function packPrice(uint256 packType_) public view returns (uint256) {
-        return _packPrices[packType_];
+    function passPrice(uint256 passType_) public view returns (uint256) {
+        return _passPrices[passType_];
     }
 }

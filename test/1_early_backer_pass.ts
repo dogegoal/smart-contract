@@ -2,8 +2,7 @@ import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@openzeppelin/hardhat-upgrades";
 
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import { expect } from "chai";
 
 const MINTER_ROLE = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("MINTER_ROLE"));
@@ -24,28 +23,35 @@ describe("Early Backer Pass", () => {
     const beneficary = owner.address;
     const feeNumerator = 500; // feeDenominator = 10000 -> 5%
 
-    const EarlyPack = await ethers.deployContract("EarlyPack");
-    await EarlyPack.initialize(payee, feeNumerator);
-    const EarlyAccess = await ethers.deployContract("EarlyAccess");
-    await EarlyAccess.initialize(EarlyPack.address, beneficary);
+    // -- EarlyPass
+    const EarlyPass = await ethers.getContractFactory("EarlyPass");
 
-    await EarlyPack.grantRole(MINTER_ROLE, EarlyAccess.address);
+    // -- EarlyAccess
+    const EarlyAccess = await ethers.getContractFactory("EarlyAccess");
 
-    await EarlyPack.updatePackURI(STARTER_PACK_ID, STARTER_PACK_URL);
-    await EarlyPack.updatePackURI(PRO_PACK_ID, PRO_PACK_URL);
+    // SMC EarlyPass
+    const earlyPass = await (await upgrades.deployProxy(EarlyPass, [payee, feeNumerator])).deployed();
 
-    await EarlyAccess.setPackPrice(STARTER_PACK_ID, STARTER_PACK_PRICE);
-    await EarlyAccess.setPackPrice(PRO_PACK_ID, PRO_PACK_PRICE);
+    // SMC EarlyAccess
+    const earlyAccess = await (await upgrades.deployProxy(EarlyAccess, [earlyPass.address, beneficary])).deployed();
+
+    await earlyPass.grantRole(MINTER_ROLE, earlyAccess.address);
+
+    await earlyPass.updatePassURI(STARTER_PACK_ID, STARTER_PACK_URL);
+    await earlyPass.updatePassURI(PRO_PACK_ID, PRO_PACK_URL);
+
+    await earlyAccess.setPassPrice(STARTER_PACK_ID, STARTER_PACK_PRICE);
+    await earlyAccess.setPassPrice(PRO_PACK_ID, PRO_PACK_PRICE);
 
     // Purchase
     await expect(
-      EarlyAccess.connect(addr1).purchasePack(STARTER_PACK_ID, {
+      earlyAccess.connect(addr1).purchasePass(STARTER_PACK_ID, {
         value: STARTER_PACK_PRICE,
       })
     ).to.changeEtherBalance(addr1, -STARTER_PACK_PRICE);
 
     await expect(
-      EarlyAccess.connect(addr1).purchasePack(PRO_PACK_ID, {
+      earlyAccess.connect(addr1).purchasePass(PRO_PACK_ID, {
         value: 2 * PRO_PACK_PRICE,
       })
     ).to.changeEtherBalance(addr1, -2 * PRO_PACK_PRICE);
